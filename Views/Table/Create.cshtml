@@ -1,0 +1,98 @@
+﻿@{
+    ViewData["Title"] = "Create New Table";
+    string dbName = ViewBag.dbname ?? "DefaultDB"; // Значення dbname, якщо воно передане
+}
+
+<h1>Create New Table</h1>
+
+<form id="createTableForm" asp-action="Create" method="post">
+    <!-- Приховане поле для передачі dbname -->
+    <input type="hidden" name="dbName" value="@dbName">
+
+    <!-- Назва таблиці -->
+    <div>
+        <label for="TableName">Table Name:</label>
+        <input type="text" id="TableName" name="TableName" placeholder="Enter table name" required>
+    </div>
+
+    <!-- Динамічні стовпчики -->
+    <div id="columnsContainer">
+        <h3>Columns</h3>
+        <button type="button" id="addColumnBtn">Add Column</button>
+        <div class="columnRow">
+            <input type="text" name="columns[0].name" placeholder="Column Name" required>
+            <select name="columns[0].type">
+                <option value="string">String</option>
+                <option value="integer">Integer</option>
+                <option value="char">Character</option>
+                <option value="real">Real</option>
+                <option value="time">Time</option>
+                <option value="timeInvl">Time Interval</option>
+            </select>
+            <button type="button" class="removeColumnBtn">Remove</button>
+        </div>
+    </div>
+
+    <button type="submit">Submit</button>
+</form>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const columnsContainer = document.getElementById('columnsContainer');
+        const addColumnBtn = document.getElementById('addColumnBtn');
+        let columnIndex = 1; // Індекс для нових стовпців
+
+        // Додавання нового стовпця
+        addColumnBtn.addEventListener('click', function () {
+            const columnRow = document.createElement('div');
+            columnRow.classList.add('columnRow');
+
+            columnRow.innerHTML = `
+                <input type="text" name="columns[${columnIndex}].name" placeholder="Column Name" required>
+                <select name="columns[${columnIndex}].type">
+                    <option value="string">String</option>
+                    <option value="int">Integer</option>
+                    <option value="float">Float</option>
+                    <option value="time">Time</option>
+                    <option value="timeInvl">Time Interval</option>
+                </select>
+                <button type="button" class="removeColumnBtn">Remove</button>
+            `;
+
+            columnsContainer.appendChild(columnRow);
+            columnIndex++;
+        });
+
+        // Видалення стовпця
+        columnsContainer.addEventListener('click', function (event) {
+            if (event.target.classList.contains('removeColumnBtn')) {
+                const columnRow = event.target.parentElement;
+                columnsContainer.removeChild(columnRow);
+            }
+        });
+    });
+</script>
+
+<style>
+    .columnRow {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 10px;
+    }
+
+    .columnRow input,
+    .columnRow select {
+        flex: 1;
+    }
+
+    .columnRow button {
+        flex-shrink: 0;
+    }
+</style>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Bootstrap JS (add this before closing </body> tag) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<link href="node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<link href="https://stackpath.bootstrapcdn.com/bootswatch/4.5.2/jungle/bootstrap.min.css" rel="stylesheet">

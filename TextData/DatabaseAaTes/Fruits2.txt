@@ -1,0 +1,3 @@
+23|Pear|4
+17|Cherry|5
+10|Banana|13

@@ -1,0 +1,4 @@
+15|Apple|1
+23|Pear|4
+17|Cherry|5
+25|Melon|19

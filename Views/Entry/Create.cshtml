@@ -1,0 +1,117 @@
+﻿@{
+    ViewData["Title"] = "Add New Row";
+    string dbName = ViewBag.dbname ?? "DefaultDB"; // Отримуємо ім'я бази даних
+    var tableColumns = ViewBag.Columns; // Перелік стовпців таблиці передається через ViewBag
+}
+
+<h1>Add New Row to Table: @ViewBag.TableName</h1>
+
+<form id="addRowForm" asp-action="Create" method="post">
+    <!-- Приховане поле для передавання dbName -->
+    <input type="hidden" name="dbName" value="@dbName">
+
+    <!-- Назва таблиці -->
+    <input type="hidden" name="tableName" value="@ViewBag.tablename">
+
+    <!-- Додавання полів для введення значень рядка -->
+    @foreach ((string, string) column in tableColumns)
+    {
+        <div>
+            <label for="@column.Item2">@column.Item2:</label>
+
+            @if (column.Item1 == "string")
+            {
+                <input type="text" id="@column.Item2" name="columns[@column.Item2]" required>
+            }
+            @if (column.Item1 == "char")
+            {
+                <input type="text" id="@column.Item2" name="columns[@column.Item2]" maxlength="1" required>
+            }
+            else if (column.Item1 == "integer")
+            {
+                <input type="number" id="@column.Item2" name="columns[@column.Item2]" required>
+            }
+            else if (column.Item1 == "real")
+            {
+                <input type="number" step="any" id="@column.Item2" name="columns[@column.Item2]" required>
+            }
+            else if (column.Item1 == "time")
+            {
+                <input type="time" id="@column.Item2" name="columns[@column.Item2]" required>
+            }
+            else if (column.Item1 == "timeInvl")
+            {
+                <!-- Для timeInvl маємо два поля для вводу часу -->
+                <label for="@column.Item2-Start">Start Time:</label>
+                <input type="time" id="@column.Item2-Start" required>
+                <label for="@column.Item2-End">End Time:</label>
+                <input type="time" id="@column.Item2-End" required>
+                <!-- Приховане поле для комбінованого значення -->
+                <input type="hidden" id="@column.Item2" name="columns[@column.Item2]">
+            }
+        </div>
+    }
+
+    <button type="submit">Submit</button>
+</form>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.getElementById('addRowForm');
+
+        form.addEventListener('submit', function (event) {
+            let isValid = true;
+
+            // Обробка полів типу timeInvl
+            const timeInvlFields = document.querySelectorAll('input[id$="-Start"]');
+            timeInvlFields.forEach(startField => {
+                const endField = document.querySelector(`input[id="${startField.id.replace('-Start', '-End')}"]`);
+                const hiddenField = document.querySelector(`input[id="${startField.id.replace('-Start', '')}"]`);
+
+                if (startField && endField && hiddenField) {
+                    const start = startField.value;
+                    const end = endField.value;
+
+                    if (start && end) {
+                        // Розділяємо час на години, хвилини та секунди
+                        const [startHours, startMinutes] = start.split(":").map(Number);
+                        const [endHours, endMinutes] = end.split(":").map(Number);
+
+                        // Логіка порівняння часу
+                        if (
+                            startHours > endHours || // Години початку більші за години кінця
+                            (startHours === endHours && startMinutes > endMinutes) // Години рівні, але хвилини початку більші за хвилини кінця
+                        ) {
+                            isValid = false;
+                            alert(`Start time must be earlier than or equal to end time for ${hiddenField.id}.`);
+                        } else {
+                            // Формуємо значення у форматі StartTime-EndTime
+                            hiddenField.value = `${start}-${end}`;
+                        }
+                    } else {
+                        isValid = false;
+                        alert(`Both start and end times must be specified for ${hiddenField.id}.`);
+                    }
+                }
+            });
+
+            if (!isValid) {
+                event.preventDefault(); // Якщо валідація не пройдена, форма не відправляється
+            }
+        });
+    });
+</script>
+
+<style>
+    form {
+        margin: 20px;
+    }
+
+    div {
+        margin-bottom: 15px;
+    }
+
+    input {
+        margin-left: 10px;
+    }
+</style>

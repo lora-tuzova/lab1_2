@@ -1,0 +1,4 @@
+real|Price|string|Name|integer|Amount
+string|Name|string|Author Name|time|Last opened
+real|Price|string|Name|integer|Amount
+char|charT|integer|intT|time|timeCol|timeInvl|invlTest

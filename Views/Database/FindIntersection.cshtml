@@ -1,0 +1,45 @@
+﻿@{
+    ViewData["Title"] = "Find Intersection Between Tables";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+
+<!-- Якщо результат є, відображаємо його -->
+@if (ViewBag.Message != null)
+{
+    <p>@ViewBag.Message</p>
+}
+
+
+    <h3>Intersection Results</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                @foreach ((string, string) item in ViewBag.Columns)
+                {
+                    <th>
+                        @item.Item2
+                        (@item.Item1)
+                    </th>
+                }
+                
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var row in ViewBag.Rows)
+            {
+                <tr>
+                    @foreach (string item in row)
+                    {
+
+                        <td>
+                            @item
+                        </td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+
+
